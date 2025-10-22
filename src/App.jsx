@@ -290,18 +290,18 @@ function App() {
     doc.text(`Grand Total: ${formatCurrency(processedData.grandTotal)}`, pageWidth / 2, yPosition + 2, { align: 'center' });
 
     // Save PDF with date range in filename
-    let filename = 'RWC-Sales-Report';
+    let filename = 'RWC-Thundertix-Sales-Report';
     if (processedData.dateRange.start && processedData.dateRange.end) {
       const startDateStr = processedData.dateRange.start.toISOString().split('T')[0];
       const endDateStr = processedData.dateRange.end.toISOString().split('T')[0];
 
       if (startDateStr === endDateStr) {
-        filename = `RWC-Sales-Report-${startDateStr}.pdf`;
+        filename = `RWC-Thundertix-Sales-Report-${startDateStr}.pdf`;
       } else {
-        filename = `RWC-Sales-Report-${startDateStr}_to_${endDateStr}.pdf`;
+        filename = `RWC-Thundertix-Sales-Report-${startDateStr}_to_${endDateStr}.pdf`;
       }
     } else {
-      filename = 'RWC-Sales-Report.pdf';
+      filename = 'RWC-Thundertix-Sales-Report.pdf';
     }
 
     doc.save(filename);

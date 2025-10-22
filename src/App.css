@@ -57,6 +57,13 @@
   transform: translateY(-2px);
 }
 
+.upload-label.dragging {
+  border-color: #667eea;
+  background: #eef2ff;
+  border-style: solid;
+  transform: scale(1.02);
+}
+
 .upload-label svg {
   color: #667eea;
   margin-bottom: 16px;

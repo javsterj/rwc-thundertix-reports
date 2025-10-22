@@ -8,10 +8,16 @@ function App() {
   const [csvData, setCsvData] = useState(null);
   const [processedData, setProcessedData] = useState(null);
   const [fileName, setFileName] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+  const parseFile = (file) => {
     if (!file) return;
+
+    // Check if it's a CSV file
+    if (!file.name.endsWith('.csv')) {
+      alert('Please upload a CSV file');
+      return;
+    }
 
     setFileName(file.name);
 
@@ -26,6 +32,37 @@ function App() {
         alert('Error parsing CSV: ' + error.message);
       }
     });
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    parseFile(file);
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    parseFile(file);
   };
 
   const processData = (data) => {
@@ -277,13 +314,20 @@ function App() {
         </div>
 
         <div className="upload-section">
-          <label htmlFor="csv-upload" className="upload-label">
+          <label
+            htmlFor="csv-upload"
+            className={`upload-label ${isDragging ? 'dragging' : ''}`}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
-            <span>Click to upload CSV file</span>
+            <span>{isDragging ? 'Drop CSV file here' : 'Click to upload or drag & drop CSV file'}</span>
             {fileName && <span className="file-name">{fileName}</span>}
           </label>
           <input

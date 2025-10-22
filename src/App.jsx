@@ -139,7 +139,7 @@ function App() {
       // Remove timezone and parse
       const cleanDate = dateStr.replace(/\s+(PDT|PST|EST|CST|MST).*$/, '');
       const date = new Date(cleanDate);
-      return isNaN(date) ? null : date;
+      return isNaN(date.getTime()) ? null : date;
     } catch {
       return null;
     }

@@ -1,0 +1,14 @@
+[build]
+  # Directory to change to before starting a build
+  base = "."
+
+  # Directory that contains the built files for deployment
+  publish = "dist"
+
+  # Build command
+  command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

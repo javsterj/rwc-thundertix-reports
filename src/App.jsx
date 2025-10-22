@@ -204,15 +204,17 @@ function App() {
         yPosition = 20;
       }
 
-      // Genre header
+      // Genre header with proper height
+      const headerHeight = 10;
       doc.setFillColor(67, 97, 238);
-      doc.rect(14, yPosition - 5, pageWidth - 28, 8, 'F');
+      doc.rect(14, yPosition, pageWidth - 28, headerHeight, 'F');
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text(genre, 16, yPosition, { baseline: 'top' });
-      
-      yPosition += 10;
+      // Center text vertically in the header box
+      doc.text(genre, 16, yPosition + (headerHeight / 2) + 2, { baseline: 'middle' });
+
+      yPosition += headerHeight + 5;
 
       // Transactions table
       const tableData = data.transactions.map(t => [

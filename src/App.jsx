@@ -139,23 +139,23 @@ function App() {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
     
+    // Format date range for display
+    let dateRangeText = '';
+    if (processedData.dateRange.start && processedData.dateRange.end) {
+      const startDate = processedData.dateRange.start.toLocaleDateString('en-US');
+      const endDate = processedData.dateRange.end.toLocaleDateString('en-US');
+      dateRangeText = startDate === endDate ? startDate : `${startDate} - ${endDate}`;
+    }
+
     // Header
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.text('Rossmoor Walnut Creek Recreation Department', pageWidth / 2, 15, { align: 'center' });
-    
+
     doc.setFontSize(14);
     doc.setFont('helvetica', 'normal');
-    doc.text('Daily Sales Report', pageWidth / 2, 23, { align: 'center' });
-    
-    // Date range
-    doc.setFontSize(10);
-    if (processedData.dateRange.start && processedData.dateRange.end) {
-      const startDate = processedData.dateRange.start.toLocaleDateString('en-US');
-      const endDate = processedData.dateRange.end.toLocaleDateString('en-US');
-      const dateRangeText = startDate === endDate ? startDate : `${startDate} - ${endDate}`;
-      doc.text(`Report Date: ${dateRangeText}`, pageWidth / 2, 30, { align: 'center' });
-    }
+    const reportTitle = dateRangeText ? `Daily Sales Report - ${dateRangeText}` : 'Daily Sales Report';
+    doc.text(reportTitle, pageWidth / 2, 23, { align: 'center' });
 
     let yPosition = 40;
 
@@ -250,11 +250,22 @@ function App() {
     doc.setFont('helvetica', 'bold');
     doc.text(`Grand Total: ${formatCurrency(processedData.grandTotal)}`, pageWidth / 2, yPosition + 2, { align: 'center' });
 
-    // Save PDF
-    const dateStr = processedData.dateRange.start ? 
-      processedData.dateRange.start.toISOString().split('T')[0] : 
-      'report';
-    doc.save(`RWC-Sales-Report-${dateStr}.pdf`);
+    // Save PDF with date range in filename
+    let filename = 'RWC-Sales-Report';
+    if (processedData.dateRange.start && processedData.dateRange.end) {
+      const startDateStr = processedData.dateRange.start.toISOString().split('T')[0];
+      const endDateStr = processedData.dateRange.end.toISOString().split('T')[0];
+
+      if (startDateStr === endDateStr) {
+        filename = `RWC-Sales-Report-${startDateStr}.pdf`;
+      } else {
+        filename = `RWC-Sales-Report-${startDateStr}_to_${endDateStr}.pdf`;
+      }
+    } else {
+      filename = 'RWC-Sales-Report.pdf';
+    }
+
+    doc.save(filename);
   };
 
   return (

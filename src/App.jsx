@@ -35,20 +35,20 @@ function App() {
     let latestDate = null;
 
     data.forEach(row => {
-      const genre = row['Sum of Total Paid/Refunded'] || row['Genres'] || 'Uncategorized';
+      const genre = row['Genres'] || 'Uncategorized';
       const dateStr = row['Date'];
-      
+
       // Track date range
       if (dateStr && dateStr.trim()) {
-        const date = new Date(dateStr);
-        if (!isNaN(date)) {
+        const date = parseDate(dateStr);
+        if (date && !isNaN(date)) {
           if (!earliestDate || date < earliestDate) earliestDate = date;
           if (!latestDate || date > latestDate) latestDate = date;
         }
       }
 
-      // Skip empty genre rows or total rows
-      if (!genre || genre.includes('Total') || genre.includes('Grand Total')) return;
+      // Skip empty genre rows
+      if (!genre || genre.trim() === '') return;
 
       if (!grouped[genre]) {
         grouped[genre] = {
@@ -57,14 +57,21 @@ function App() {
         };
       }
 
-      // Only add if row has a date (actual transaction)
-      if (dateStr && dateStr.trim()) {
-        const amount = parseFloat(row['Payment Type'] || row['card'] || '0');
+      // Only add if row has a date and order ID (actual transaction)
+      if (dateStr && dateStr.trim() && row['Order ID']) {
+        const amount = parseFloat(row['Total Paid/Refunded'] || '0');
+
+        // Clean payment details - remove the ="xxxx" format
+        let paymentDetails = row['Payment Details'] || '';
+        if (paymentDetails.startsWith('="') && paymentDetails.endsWith('"')) {
+          paymentDetails = paymentDetails.slice(2, -1);
+        }
+
         grouped[genre].transactions.push({
-          id: row['Classes'] || '',
+          id: row['Order ID'] || '',
           date: dateStr,
-          paymentDetails: row['Payment Details'] || '',
-          cardType: row['Card Type'] || '',
+          paymentDetails: paymentDetails,
+          cardType: row['Card Type'] || row['Payment Type'] || '',
           amount: amount
         });
         grouped[genre].total += amount;
@@ -87,9 +94,25 @@ function App() {
     });
   };
 
+  const parseDate = (dateStr) => {
+    if (!dateStr || !dateStr.trim()) return null;
+
+    // Parse format like "10/17/25 8:33am PDT"
+    try {
+      // Remove timezone and parse
+      const cleanDate = dateStr.replace(/\s+(PDT|PST|EST|CST|MST).*$/, '');
+      const date = new Date(cleanDate);
+      return isNaN(date) ? null : date;
+    } catch {
+      return null;
+    }
+  };
+
   const formatDate = (dateStr) => {
     try {
-      const date = new Date(dateStr);
+      const date = parseDate(dateStr);
+      if (!date || isNaN(date)) return dateStr;
+
       return date.toLocaleString('en-US', {
         month: '2-digit',
         day: '2-digit',
